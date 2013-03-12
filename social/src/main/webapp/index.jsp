@@ -1,0 +1,150 @@
+<%--
+
+    Copyright 2004-2010 the Seasar Foundation and the Others.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+    either express or implied. See the License for the specific language
+    governing permissions and limitations under the License.
+
+--%>
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta http-equiv="Content-Script-Type" content="text/JavaScript" />
+  <link href="${contextPath}/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="screen,projection" />
+  <link href="${contextPath}/css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css" media="screen,projection" />
+  <link href="${contextPath}/css/border.css" rel="stylesheet" type="text/css" media="screen,projection" />
+  <link href="${contextPath}/css/default.css" rel="stylesheet" type="text/css" media="screen,projection" />
+  <link href="${contextPath}/css/socialrally.css" rel="stylesheet" type="text/css" media="screen,projection" />
+  <title>Social Rally </title>
+</head>
+<body>
+<jsp:include page="common/bodyheader.jsp"></jsp:include>
+<div id="container" class="container-fluid">
+<jsp:include page="common/navbar.jsp"></jsp:include>
+<div id="content">
+<div class="row-fluid">
+<div class="span3 left_navi">
+</div>
+<div class="span6" id="main">
+<t:form action="${contextPath}/event/showDetail" value="${action}" method="post" id="showSocialEventForm">
+<h4 class="border facebook topline bottomline leftline7 rightline">管理中のイベント一覧</h4>
+<div class="row-fluid">
+<input type="hidden" id="EventId" name="eventId" value="" />
+<div class="span12">
+<ul class="thumbnails">
+<c:forEach var="event" items="${action.eventList}" varStatus="status">
+	<li class="span6">
+		<div class="thumbnail">
+			<img src="${f:out(event.memberFileUrl)}" alt="${f:out(event.eventName)}">
+			<div class="caption">
+				<h5>${f:out(event.eventName)}</h5>
+				<p>${f:out(event.description)}</p>
+				<p><t:input name="eventdetail" type="button" class="btn eventDetailButton" value="詳細" onClick="showEventDetail(${f:out(event.eventId)})"/></p>
+			</div>
+		</div>
+	</li>
+</c:forEach>
+</ul>
+</div>
+</div>
+</t:form>
+<br/>
+<t:form action="${contextPath}/event/createevent" method="post" value="${action}" >
+<t:input name="createEvent" class="btn btn-info" type="submit" value="イベントを作成する"/>
+</t:form>
+</div><!-- main -->
+<div class="span3 right_navi">
+</div>
+</div><!-- row-fluid -->
+</div><!-- content -->
+<div id="footer">
+	<div class="row-fluid">
+	<a href="http://www.g-aster.jp/">Copyright 2013  All Rights Reserved</a>
+	</div>
+</div>
+</div><!-- container -->
+
+
+
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js"></script>
+<script type="text/javascript" src="${contextPath}/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		/*トップ画面*/
+//		$(".eventImage").click(function(){//画像ボタン押下(イベント選択）時処理
+//			alert('呼ばれました');
+//			$('#EventId').val($(this).
+//				closest('div'). // <div>要素直上の<tr>要素を取得
+//				children('input'). // 配下から2番目の<input>要素を取得
+//				text() // そのテキスト値をEventIdの値に設定
+//			);
+//			$('#showSocialEventForm').submit();
+//		});
+//		$(".eventDetailButton").click(function(){//詳細ボタン押下時処理
+//			$('#EventId').val(jQuery.trim($(this).parent().parent().children("td:nth-child(2)").text()));
+//			$('#showSocialEventForm').submit();
+//		});
+		/* 詳細画面 */
+		$("#updateEventStampButton").click(function(){//スタンプの更新ボタン押下時処理
+			$('#updateEventStampForm').submit();
+		});
+    	$('#stamp-dialog').dialog({//QRコード表示ダイアログ初期制御
+			autoOpen: false
+		});
+		$(".showQRButton").click(function() {//QRコード表示ボタン押下時処理
+			$('#stamp-dialog img').attr("src",'http://localhost/yoyaku_sys/yoyaku/img/stamp/' +$(this).parent().parent().parent().find('.qrcode').val());
+			$('#stamp-dialog img').attr("alt",$(this).parent().parent().parent().find('.qrcode').val());
+			//選択行のバーコードをダイアログに移す
+			$('#stamp-dialog').dialog('open');
+		});
+
+		//入力時のkeyupをイベントリスナーとして登録
+		$(".stamp-action").each(function(){
+			$(this).bind('keyup', makePostSentence(this));
+		});
+		$(".stamp-place").each(function(){
+			$(this).bind('keyup', makePostSentence(this));
+		});
+
+	});
+
+	//Topページ、イベント詳細表示
+	function showEventDetail(id){
+		document.getElementById('EventId').value = id;
+		document.getElementById('showSocialEventForm').submit();
+	}
+
+	//詳細ページ、投稿の表示制御
+	function makePostSentence(element){
+		var v, old = element.value;
+		return function(){
+			if(old != (v=element.value)){
+				old = v;
+				place = $(this).parent().parent().find('.stamp-place').val();
+				action = $(this).parent().parent().find('.stamp-action').val();
+				str = $(this).val();
+				if(place){
+					$(this).parent().parent().find('.stamp-fbpost').val(place + "にて" + action);
+				}else{
+					$(this).parent().parent().find('.stamp-fbpost').val(action);
+				}
+			}
+		}
+	}
+
+</script></body>
+</html>

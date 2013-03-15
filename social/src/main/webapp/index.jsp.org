@@ -18,15 +18,12 @@
 
 <!DOCTYPE html>
 <html lang="ja">
-<jsp:include page="/common/htmlheader.jsp"></jsp:include>
+<c:import url="/common/htmlheader.jsp"/>
 <body>
-
-<jsp:include page="/common/bodyheader.jsp"></jsp:include>
-
-
-<div id="container" class="container-fluid">
-<jsp:include page="/common/navbar.jsp"></jsp:include>
+<c:import url="/common/bodyheader.jsp"/>
 <c:import url="/common/errors.jsp"/>
+<div id="container" class="container-fluid">
+<c:import url="/common/navbar.jsp"/>
 <div id="content">
 <div class="row-fluid">
 <div class="span3 left_navi">
@@ -34,68 +31,31 @@
 <div class="span6" id="main">
 <c:import url="/common/errors.jsp"/>
 <c:import url="/common/notice.jsp"/>
-<t:form action="${contextPath}/event/create" value="${action}"  class="form-horizontal" method="post">
-<h4 class="border facebook topline bottomline leftline7 rightline">イベント作成</h4>
-<input type="hidden" id="EventId" value="" />
-
-<div class="control-group">
-<label class="control-label">イベント名</label>
-<div class="controls">
-<t:input name="eventName" type="text" length="16" placeholder="XXXX商店街スタンプラリー"/>
+<t:form action="${contextPath}/event/showDetail" value="${action}" method="post" id="showSocialEventForm">
+<h4 class="border facebook topline bottomline leftline7 rightline">管理中のイベント一覧</h4>
+<div class="row-fluid">
+<input type="hidden" id="EventId" name="eventId" value="" />
+<div class="span12">
+<ul class="thumbnails">
+<c:forEach var="event" items="${action.eventList}" varStatus="status">
+	<li class="span6">
+		<div class="thumbnail">
+			<img src="${f:out(event.memberFileUrl)}" alt="${f:out(event.eventName)}">
+			<div class="caption">
+				<h5>${f:out(event.eventName)}</h5>
+				<p>${f:out(event.description)}</p>
+				<p><t:input name="eventdetail" type="button" class="btn eventDetailButton" value="詳細" onClick="showEventDetail(${f:out(event.eventId)})"/></p>
+			</div>
+		</div>
+	</li>
+</c:forEach>
+</ul>
 </div>
 </div>
-
-<div class="control-group">
-<label class="control-label">イベント開始日</label>
-<div class="controls">
-<t:input name="eventDateFrom" type="text" length="16" id="eventDateFrom" />
-</div>
-</div>
-
-
-<div class="control-group">
-<label class="control-label">イベント終了日</label>
-<div class="controls">
-<t:input name="eventDateTo" type="text" length="16" id="eventDateTo" />
-</div>
-</div>
-
-<div class="control-group">
-<label class="control-label">開催場所</label>
-<div class="controls">
-<t:input name="place" type="text" length="16" placeholder="開催場所を入力してください"/>
-</div>
-</div>
-
-<div class="control-group">
-<label class="control-label">説明</label>
-<div class="controls">
-<t:input name="description" type="text" length="16" placeholder="Facebookへ表示されます"/>
-</div>
-</div>
-
-<div class="control-group">
-<label class="control-label">スタンプの数</label>
-<div class="controls">
-<t:input name="stampCount" type="text" length="2" />
-</div>
-</div>
-
-<div class="control-group">
-<label class="control-label">画像ファイル</label>
-
-
-<div class="controls">
-	<select class="image-picker" name="selectImage" id="selectI">
-	<c:forEach var="memberFile" items="${action.memberFileList}" varStatus="status">
-		<option value='${f:out(memberFile.fileId)}' data-img-src='${f:out(memberFile.imageUrl)}'>${f:out(memberFile.fileName)}</option>
-	</c:forEach>
-	</select>
-</div>
-</div>
-
-<t:input name="createEvent" class="btn btn-info" type="submit" value="登録"/>
-
+</t:form>
+<br/>
+<t:form action="${contextPath}/event/createevent" method="post" value="${action}" >
+<t:input name="createEvent" class="btn btn-info" type="submit" value="イベントを作成する"/>
 </t:form>
 </div><!-- main -->
 <div class="span3 right_navi">
@@ -104,9 +64,7 @@
 </div><!-- content -->
 <div id="footer">
 	<div class="row-fluid">
-	<div class="span3">
 	<a href="http://www.g-aster.jp/">Copyright 2013  All Rights Reserved</a>
-	</div>
 	</div>
 </div>
 </div><!-- container -->
@@ -114,30 +72,26 @@
 
 
 
-<!--[if lt IE 9]>
-<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-<![endif]-->
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js"></script>
-<script src="${contextPath}/js/image-picker.min.js"></script>
-<script src="${contextPath}/js/bootstrap.min.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+<script type="text/javascript" src="${contextPath}/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="${contextPath}/js/image-picker.min.js"></script>
 <script type="text/javascript">
-
 	$(document).ready(function() {
-		$(function() {
-			$("#eventDateFrom").datepicker();
-		});
-		$(function() {
-			$("#eventDateTo").datepicker();
-		});
-		$(function() {
-			$("select.image-picker").imagepicker({
-				hide_select:  false,
-		    });
-		});
-
-
+		/*トップ画面*/
+//		$(".eventImage").click(function(){//画像ボタン押下(イベント選択）時処理
+//			alert('呼ばれました');
+//			$('#EventId').val($(this).
+//				closest('div'). // <div>要素直上の<tr>要素を取得
+//				children('input'). // 配下から2番目の<input>要素を取得
+//				text() // そのテキスト値をEventIdの値に設定
+//			);
+//			$('#showSocialEventForm').submit();
+//		});
+//		$(".eventDetailButton").click(function(){//詳細ボタン押下時処理
+//			$('#EventId').val(jQuery.trim($(this).parent().parent().children("td:nth-child(2)").text()));
+//			$('#showSocialEventForm').submit();
+//		});
 		/* 詳細画面 */
 		$("#updateEventStampButton").click(function(){//スタンプの更新ボタン押下時処理
 			$('#updateEventStampForm').submit();
@@ -161,6 +115,12 @@
 		});
 
 	});
+
+	//Topページ、イベント詳細表示
+	function showEventDetail(id){
+		document.getElementById('EventId').value = id;
+		document.getElementById('showSocialEventForm').submit();
+	}
 
 	//詳細ページ、投稿の表示制御
 	function makePostSentence(element){

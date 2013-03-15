@@ -83,4 +83,9 @@ public class EventServiceImpl implements EventService {
 		return dto;
 	}
 
+	@Override
+	public void updateEvent(EventDto dto) throws DataNotFoundException {
+		eventLogic.updateEvent(dto);
+	}
+
 }

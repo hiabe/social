@@ -23,6 +23,8 @@ import javax.persistence.TemporalType;
 @Table(name = "member_img_file")
 public class MemberImageFile {
 
+	public static final int FILEID_NOIMAGE=0;
+
 	@Id
 	@Column(name="file_id")
 	@GeneratedValue(strategy=GenerationType.IDENTITY)

@@ -22,7 +22,10 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import jp.g_aster.social.dto.EventDto;
+import jp.g_aster.social.dto.StampDto;
+import jp.g_aster.social.form.TopForm;
 import jp.g_aster.social.service.EventService;
+import jp.g_aster.social.service.StampService;
 import jp.g_aster.social.util.SocialUtil;
 
 import org.apache.commons.logging.Log;
@@ -51,16 +54,79 @@ public class IndexAction {
 
 	public ActionContext actionContext;
 
+	/**
+	 * イベントリスト、
+	 */
 	public List<EventDto> eventList;
+
+	public List<StampDto> stampList;
+
 
 	public List<EventDto> memberEventList;
 
 	@Resource
 	public EventService socialEventService;
 
+	@Resource
+	public StampService stampService;
 
-	@Form("eventDto")
+	public TopForm topForm;
+
+
 	public ActionResult index() {
+
+		//認証していない場合は、FBのOAUTHへ
+		if (!this.sessionScope.containsKey("user")) {
+			log.debug("認証エラーのため、callback");
+			sessionScope.put("redirect","/");
+
+			Facebook facebook = new FacebookFactory().getInstance();
+			String redirectURL = facebook.getOAuthAuthorizationURL(SocialUtil.getCallbackURL());
+			sessionScope.put("facebook",facebook);
+			return new Redirect(redirectURL);
+		}
+
+		//facebook情報取得
+		User user = (User)this.sessionScope.get("user");
+		log.debug("◆email◆="+user.getEmail());
+		log.debug("◆name◆="+user.getName());
+
+		topForm =stampService.getStampAndImageList(user.getId());
+		//自分が保持しているスタンプを取得する。
+
+		return new Forward("index.jsp");
+	}
+
+	/**
+	 * 説明についてのアクション
+	 * @return
+	 */
+	public ActionResult about() {
+		return new Forward("/commmon/about.jsp");
+	}
+
+	/**
+	 * お問い合わせフォーム
+	 * @return
+	 */
+	public ActionResult inquiry() {
+		return new Forward("/commmon/inquiry.jsp");
+	}
+
+	/**
+	 * 個人情報保護方針
+	 * @return
+	 */
+	public ActionResult privacy() {
+		return new Forward("/commmon/privacy.jsp");
+	}
+
+	/**
+	 * イベント用、スタンプラリーになったら利用する。
+	 * @return
+	 */
+	@Form("eventDto")
+	public ActionResult indexEvent() {
 
 		//認証していない場合は、FBのOAUTHへ
 		if (!this.sessionScope.containsKey("user")) {
@@ -84,31 +150,7 @@ public class IndexAction {
 		//自分が参加しているイベントを取得する。
 		this.memberEventList = socialEventService.getSocialEventList(user.getId());
 
-		actionContext.getFlashMap().put("notice","既にログイン済みです。");
-
 		return new Forward("index.jsp");
 	}
-
-
-
-//	/*ログイン後の初期処理*/
-//	private void loginInit(){
-//		//自分が管理者イベント一覧を取得する。
-//
-//		//TODO 管理者テーブルに管理者情報の登録
-//		$me = $this->facebook->api('/me',array('locale'=>'ja_JP'));
-//		$social_event_data = $this->SocialEvent->find('all',array('conditions'=>array('fb_id'=>$me['id'])));
-//		$this->set('socialEvents',$social_event_data);
-//
-//		//自分が参加者のイベント一覧を取得する。
-//		$this->SocialEventMember->primaryKey = 'social_event_id';//アソシエーションのための暫定
-//		$member_event_data = $this->SocialEventMember->find('all',array('conditions'=>array('SocialEventMember.fb_id'=>$me['id'])));
-//		$this->SocialEventMember->primaryKey = 'id';//もとに戻す
-//		$this->set('memberEvents',$member_event_data);
-//
-//		$this->set('adminInfo',$me);
-//		$this->Session->write('social_id',$me['id']);
-//		$this->Session->write('adminInfo',$me);
-//	}
 
 }

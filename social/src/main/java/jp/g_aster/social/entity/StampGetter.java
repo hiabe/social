@@ -14,36 +14,31 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 /**
- * ソーシャルイベントに関するクラス
+ * イベントスタンプエンティティ
  * @author hiroshi-abe
  *
  */
 @Entity
-@Table(name = "event_member")
-public class EventMember {
+@Table(name = "stamp_getter")
+public class StampGetter {
 
 	@Id
-	@Column(name="event_member_id")
+	@Column(name="stamp_getter_id")
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private long eventMemberId;
+	private int stampGetterId;
 
-	@Column(name="admin_fb_id")
-	private long adminFacebookId;
-
-	@Column(name="event_id")
-	private int eventId;
+	@Column(name="stamp_id")
+	private int stampId;
 
 	@Column(name="fb_id")
 	private String facebookId;
 
-	@Temporal(TemporalType.TIME)
-	@Column(name="entry_date_time")
-	private Date entryDateTime;
-
-	@Temporal(TemporalType.TIME)
-	@Column(name="cancel_date_time")
-	private Date cancelDateTime;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="get_date_time")
+	private Date getDateTime;
 
 	@Column(name="creator")
 	private String creator;
@@ -59,46 +54,20 @@ public class EventMember {
 	@Column(name="modified")
 	private Date modified;
 
+
+
 	/**
-	 * @return eventMemberId
+	 * @return stampId
 	 */
-	public long getEventMemberId() {
-		return eventMemberId;
+	public int getStampId() {
+		return stampId;
 	}
 
 	/**
-	 * @param eventMemberId セットする eventMemberId
+	 * @param stampId セットする stampId
 	 */
-	public void setEventMemberId(long eventMemberId) {
-		this.eventMemberId = eventMemberId;
-	}
-
-	/**
-	 * @return adminFacebookId
-	 */
-	public long getAdminFacebookId() {
-		return adminFacebookId;
-	}
-
-	/**
-	 * @param adminFacebookId セットする adminFacebookId
-	 */
-	public void setAdminFacebookId(long adminFacebookId) {
-		this.adminFacebookId = adminFacebookId;
-	}
-
-	/**
-	 * @return eventId
-	 */
-	public int getEventId() {
-		return eventId;
-	}
-
-	/**
-	 * @param eventId セットする eventId
-	 */
-	public void setEventId(int eventId) {
-		this.eventId = eventId;
+	public void setStampId(int stampId) {
+		this.stampId = stampId;
 	}
 
 	/**
@@ -116,31 +85,17 @@ public class EventMember {
 	}
 
 	/**
-	 * @return entryDateTime
+	 * @return getDateTime
 	 */
-	public Date getEntryDateTime() {
-		return entryDateTime;
+	public Date getGetDateTime() {
+		return getDateTime;
 	}
 
 	/**
-	 * @param entryDateTime セットする entryDateTime
+	 * @param getDateTime セットする getDateTime
 	 */
-	public void setEntryDateTime(Date entryDateTime) {
-		this.entryDateTime = entryDateTime;
-	}
-
-	/**
-	 * @return cancelDateTime
-	 */
-	public Date getCancelDateTime() {
-		return cancelDateTime;
-	}
-
-	/**
-	 * @param cancelDateTime セットする cancelDateTime
-	 */
-	public void setCancelDateTime(Date cancelDateTime) {
-		this.cancelDateTime = cancelDateTime;
+	public void setGetDateTime(Date getDateTime) {
+		this.getDateTime = getDateTime;
 	}
 
 	/**
@@ -197,6 +152,11 @@ public class EventMember {
 	 */
 	public void setModified(Date modified) {
 		this.modified = modified;
+	}
+
+	@Override
+	public String toString(){
+		return ReflectionToStringBuilder.toString(this);
 	}
 
 

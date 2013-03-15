@@ -14,4 +14,9 @@ public interface MemberImageFileLogic {
 
 	List<MemberImageFileDto> getMemberImageFileList(String facebookId);
 
+	/**
+	 * @param memberImageFile
+	 */
+	void insertImageFileData(MemberImageFileDto memberImageFileDto);
+
 }

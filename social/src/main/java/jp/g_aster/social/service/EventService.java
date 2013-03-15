@@ -73,4 +73,11 @@ public interface EventService {
 	 */
 	StampDto  getQRImageUrl(String facebookId,int eventId,int stampId) throws DataNotFoundException;
 
+
+	/**
+	 * イベント（包含するスタンプ）の更新を行います。
+	 * @throws DataNotFoundException
+	 */
+	void updateEvent(EventDto dto) throws DataNotFoundException;
+
 }

@@ -2,6 +2,8 @@
 <html lang="ja">
 <jsp:include page="/common/htmlheader.jsp"></jsp:include>
 <body>
+<c:import url="/common/errors.jsp"/>
+<c:import url="/common/notice.jsp"/>
 <form>
 <select class="image-picker" name="selectImage">
 <c:forEach var="memberFile" items="${action.memberFileList}" varStatus="status">

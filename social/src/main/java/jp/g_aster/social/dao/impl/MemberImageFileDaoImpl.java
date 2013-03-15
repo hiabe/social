@@ -28,8 +28,12 @@ public class MemberImageFileDaoImpl implements MemberImageFileDao {
 
 	@Override
 	public MemberImageFile findByFileId(int fileId) {
-		// TODO 自動生成されたメソッド・スタブ
 		return jdbcManager.from(MemberImageFile.class).where("fileId=?",fileId).getSingleResult();
+	}
+
+	@Override
+	public void insert(MemberImageFile memberImageFile) {
+		jdbcManager.insert(memberImageFile).execute();
 	}
 
 }

@@ -20,13 +20,15 @@ public class StampDto {
 
 	private String imageUrl;
 
+	private String linkName;
+
 	private String caption;
 
 	private String postUrl;
 
 	private String message;
 
-	private String authenticationKey;
+	private String authKey;
 
 	private int fileId;
 
@@ -141,17 +143,17 @@ public class StampDto {
 
 
 	/**
-	 * @return authenticationKey
+	 * @return authKey
 	 */
-	public String getAuthenticationKey() {
-		return authenticationKey;
+	public String getAuthKey() {
+		return authKey;
 	}
 
 	/**
-	 * @param authenticationKey セットする authenticationKey
+	 * @param authKey セットする authKey
 	 */
-	public void setAuthenticationKey(String authenticationKey) {
-		this.authenticationKey = authenticationKey;
+	public void setAuthKey(String authKey) {
+		this.authKey = authKey;
 	}
 
 	/**
@@ -239,6 +241,20 @@ public class StampDto {
 	}
 
 
+
+	/**
+	 * @return linkName
+	 */
+	public String getLinkName() {
+		return linkName;
+	}
+
+	/**
+	 * @param linkName セットする linkName
+	 */
+	public void setLinkName(String linkName) {
+		this.linkName = linkName;
+	}
 
 	/**
 	 * @return caption

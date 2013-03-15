@@ -20,4 +20,11 @@ public interface MemberImageFileDao {
 	 */
 	MemberImageFile findByFileId(int fileId);
 
+	/**
+	 * 登録を実施します。
+	 *
+	 * @param memberImageFile
+	 */
+	void insert(MemberImageFile memberImageFile);
+
 }

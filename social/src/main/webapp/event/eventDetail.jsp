@@ -29,6 +29,8 @@
 <div class="row-fluid">
 <div class="span3 left_navi">
 </div>
+<c:import url="/common/errors.jsp"/>
+<c:import url="/common/notice.jsp"/>
 <div class="span6 border topline bottomline leftline rightline" id="main">
 <t:form action="${contextPath}/event/update" value="${action}" method="post" id="showSocialEventForm" class="form-horizontal">
 <h4 class="border facebook topline bottomline leftline7 rightline">イベント詳細</h4>
@@ -47,8 +49,6 @@
 <t:input name="eventDateFrom" type="text" length="16" id="eventDateFrom"  value="${f:out(event.eventDateFromString)}"/>
 </div>
 </div>
-
-
 <div class="control-group">
 <label class="control-label">イベント終了日</label>
 <div class="controls">

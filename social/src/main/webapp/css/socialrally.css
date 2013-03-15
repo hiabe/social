@@ -70,14 +70,12 @@ img { -ms-interpolation-mode: bicubic; }
 
 /* レフトナビ*/
 .left_navi{
-	background-color: red;
 
 	border-right: solid 1px;
 }
 
 /*メイン*/
 .right_navi{
-	background-color: red;
 }
 /*イベントの画像*/
 img .eventImage{
@@ -112,5 +110,9 @@ input .text-long {
 .form-horizontal .fields{
 	padding-top: 5px;
     margin-left: 180px;
+    line-height:2rem;
+}
+    line-height:2rem;
+}
     line-height:2rem;
 }

@@ -40,4 +40,11 @@ public class MemberImageFileLogicImpl implements MemberImageFileLogic {
 		return dtoList;
 	}
 
+	@Override
+	public void insertImageFileData(MemberImageFileDto memberImageFileDto) {
+		MemberImageFile memberImageFile = new MemberImageFile();
+		BeanUtil.copyProperties(memberImageFileDto, memberImageFile);
+		memberImageFileDao.insert(memberImageFile);
+	}
+
 }

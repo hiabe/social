@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ import javax.annotation.Resource;
 import jp.g_aster.social.dto.EventDto;
 import jp.g_aster.social.dto.MemberImageFileDto;
 import jp.g_aster.social.dto.StampDto;
+import jp.g_aster.social.entity.Stamp;
 import jp.g_aster.social.exception.DataNotFoundException;
 import jp.g_aster.social.exception.DuplicatedException;
 import jp.g_aster.social.form.CreateEventForm;
@@ -47,9 +49,12 @@ import org.seasar.cubby.action.Redirect;
 import org.seasar.cubby.action.RequestParameter;
 import org.seasar.framework.beans.util.BeanUtil;
 
+import com.google.gson.Gson;
+
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
+import facebook4j.Post;
 import facebook4j.PostUpdate;
 import facebook4j.User;
 
@@ -70,7 +75,6 @@ public class EventAction {
 	public CreateEventForm createEventForm = new CreateEventForm();
 
 	public UpdateEventForm updateEventForm = new UpdateEventForm();
-
 
 	public StampDto stampDto;
 
@@ -122,20 +126,39 @@ public class EventAction {
 		//facebookへポストする。
 		Facebook facebook = (Facebook)sessionScope.get("facebook");
 		PostUpdate post;
-		try {
-//			post = new PostUpdate(new URL(eventDto.getPageUrl()))
-//			.picture(new URL(eventDto.getMemberFileUrl()))
-//			.name(eventDto.getEventName())
-//			.message(user.getName()+"が"+eventDto.getEventName()+"へ参加しました！")
-//			.caption("見出し")
-//			.description(eventDto.getDescription());
+		Post.Action action = new Post.Action(){
+			private Gson gson = new Gson();
+			public String getLink(){
+				Map<String,String> map= new HashMap<String,String>();
+				map.put("link", "http://www.g-aster.jp");
+				return gson.toJson(map);
+			}
+			public String getName(){
+				Map<String,String> map= new HashMap<String,String>();
+				map.put("name", "G-aster.ltd");
+				return gson.toJson(map);
+			}
 
-			post = new PostUpdate(new URL("http://www.yahoo.co.jp"))
-			.picture(new URL(eventDto.getMemberFileUrl()))
+		};
+		List<Post.Action> actionList = new ArrayList<Post.Action>();
+		actionList.add(action);
+		try {
+			if(eventDto.getPageUrl().startsWith("http://localhost")){
+				post = new PostUpdate(new URL("http://www.g-aster.jp"));
+			}else{
+				post = new PostUpdate(new URL(eventDto.getPageUrl()));
+			}
+			log.debug("◆◆link="+action.getLink());
+			log.debug("◆◆name="+action.getName());
+//			Gson gson = new Gson();
+			post.picture(new URL(eventDto.getMemberFileUrl()))
 			.name(eventDto.getEventName())
 			.message(user.getName()+"が"+eventDto.getEventName()+"へ参加しました！")
-			.caption("見出し")
-			.description(eventDto.getDescription());
+			.caption(eventDto.getEventName())
+			.description(eventDto.getDescription())
+			.actions(actionList)
+			;
+
 			facebook.postFeed(post);
 		} catch (FacebookException e){
 			e.printStackTrace();
@@ -148,19 +171,23 @@ public class EventAction {
 		return new Forward("entryFinished.jsp");
 	}
 
+	/**
+	 * イベント詳細を表示します。
+	 * @return
+	 */
 	public ActionResult showDetail() {
 
-		//TODO ログインしているかチェック
-		if(isLogin())
-			try {
-				this.event =  eventService.getSocialEvent(Integer.parseInt(eventId));
-			} catch (NumberFormatException e) {
-				// TODO 自動生成された catch ブロック
-				new Forward("error.jsp");
-			} catch (DataNotFoundException e) {
-				// TODO 自動生成された catch ブロック
-				new Forward("error.jsp");
-			}
+		if(!this.isLogin()){
+			return new Redirect("/");
+		}
+
+		try {
+			this.event =  eventService.getSocialEvent(Integer.parseInt(eventId));
+		} catch (NumberFormatException e) {
+			new Forward("error.jsp");
+		} catch (DataNotFoundException e) {
+			new Forward("error.jsp");
+		}
 
 		return new Forward("eventDetail.jsp");
 	}
@@ -171,7 +198,6 @@ public class EventAction {
 	 * @return
 	 */
 	public ActionResult createevent() {
-		//TODO ログインチェック
 		if(!this.isLogin()){
 			log.info("◆◆ログインしていないため、ＴＯＰへ戻ります◆◆");
 			return new Redirect("/");
@@ -183,8 +209,6 @@ public class EventAction {
 		if(memberFileList == null){
 			memberFileList = new ArrayList<MemberImageFileDto>();
 		}
-		//画像一覧を取得する。
-		this.memberFileList =  eventService.getMemberImageFileList(user.getId());
 
 		return new Forward("createEvent.jsp");
 	}
@@ -218,6 +242,9 @@ public class EventAction {
 
 		//イベントの登録
 		eventService.makeEvent(dto);
+		actionContext.getFlashMap().put("notice", "イベントの登録が完了しました。");
+
+
 
 		return new Redirect("/");
 	}
@@ -246,7 +273,6 @@ public class EventAction {
 	public ActionResult showQRCode() {
 
 		if(!this.isLogin()){
-			log.info("◆◆ログインしていないため、ＴＯＰへ戻ります◆◆");
 			return new Redirect("/");
 		}
 		User user = (User)this.sessionScope.get("user");
@@ -270,6 +296,23 @@ public class EventAction {
 	@Form("updateEventForm")
 	public ActionResult update() {
 		log.debug(updateEventForm.toString());
-		return new Forward("showDetail.jsp");
+		EventDto eventDto = new EventDto();
+		BeanUtil.copyProperties(updateEventForm, eventDto);
+		for(int i=0;i<updateEventForm.getPostUrl().size();i++){
+			Stamp stamp = new Stamp();
+			stamp.setCaption(updateEventForm.getCaption().get(i));
+			stamp.setMessage(updateEventForm.getMessage().get(i));
+			stamp.setPostUrl(updateEventForm.getPostUrl().get(i));
+			stamp.setStampId(Integer.parseInt(updateEventForm.getStampId().get(i)));
+		}
+		try {
+			eventService.updateEvent(eventDto);
+		} catch (DataNotFoundException e) {
+			e.printStackTrace();
+			actionContext.getFlashMap().put("error", "該当データが存在しません。");
+			return new Forward("/common/error.jsp");
+		}
+		actionContext.getFlashMap().put("notice", "更新が完了しました。");
+		return new Forward("/event/eventDetail.jsp");
 	}
 }

@@ -18,40 +18,33 @@
 
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="utf-8" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
-  <meta http-equiv="Content-Script-Type" content="text/JavaScript" />
-  <link href="${contextPath}/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="screen,projection" />
-  <link href="${contextPath}/css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css" media="screen,projection" />
-  <link href="${contextPath}/css/border.css" rel="stylesheet" type="text/css" media="screen,projection" />
-  <link href="${contextPath}/css/default.css" rel="stylesheet" type="text/css" media="screen,projection" />
-  <link href="${contextPath}/css/socialrally.css" rel="stylesheet" type="text/css" media="screen,projection" />
-  <title>Social Rally </title>
-</head>
+<c:import url="/common/htmlheader.jsp"/>
 <body>
-<jsp:include page="common/bodyheader.jsp"></jsp:include>
+<c:import url="/common/bodyheader.jsp"/>
+<c:import url="/common/errors.jsp"/>
 <div id="container" class="container-fluid">
-<jsp:include page="common/navbar.jsp"></jsp:include>
+<c:import url="/common/navbar.jsp"/>
 <div id="content">
 <div class="row-fluid">
 <div class="span3 left_navi">
 </div>
 <div class="span6" id="main">
-<t:form action="${contextPath}/event/showDetail" value="${action}" method="post" id="showSocialEventForm">
-<h4 class="border facebook topline bottomline leftline7 rightline">管理中のイベント一覧</h4>
+<c:import url="/common/errors.jsp"/>
+<c:import url="/common/notice.jsp"/>
+<t:form action="${contextPath}/stamp/showDetail" value="${action}" method="post" id="showStampForm">
+<h4 class="border facebook topline bottomline leftline7 rightline">QRコード一覧</h4>
 <div class="row-fluid">
-<input type="hidden" id="EventId" name="eventId" value="" />
+<input type="hidden" id="authKey" name="authKey" value="" />
 <div class="span12">
 <ul class="thumbnails">
-<c:forEach var="event" items="${action.eventList}" varStatus="status">
+<c:forEach var="stamp" items="${action.topForm.stampList}" varStatus="status">
 	<li class="span6">
 		<div class="thumbnail">
-			<img src="${f:out(event.memberFileUrl)}" alt="${f:out(event.eventName)}">
+			<img src="${f:out(stamp.memberFileUrl)}" alt="${f:out(stamp.caption)}">
 			<div class="caption">
-				<h5>${f:out(event.eventName)}</h5>
-				<p>${f:out(event.description)}</p>
-				<p><t:input name="eventdetail" type="button" class="btn eventDetailButton" value="詳細" onClick="showEventDetail(${f:out(event.eventId)})"/></p>
+				<h5>${f:out(stamp.caption)}</h5>
+				<p>${f:out(stamp.message)}</p>
+				<p><t:input name="stampDetail" type="button" class="btn stampDetailButton" value="詳細" onClick="showStampDetail('${f:out(stamp.authKey)}')"/></p>
 			</div>
 		</div>
 	</li>
@@ -61,9 +54,38 @@
 </div>
 </t:form>
 <br/>
-<t:form action="${contextPath}/event/createevent" method="post" value="${action}" >
-<t:input name="createEvent" class="btn btn-info" type="submit" value="イベントを作成する"/>
+<t:form action="${contextPath}/stamp/createStamp" method="post" value="${action}" >
+<t:input name="createEvent" class="btn btn-info" type="submit" value="アクションＱＲを作成する"/>
 </t:form>
+<h4 class="border facebook topline bottomline leftline7 rightline">画像一覧</h4>
+<div class="row-fluid">
+<input type="hidden" id="StampId" name="stampId" value="" />
+<div class="span12">
+<form>
+<select class="image-picker" name="selectImage">
+<c:forEach var="memberFile" items="${action.topForm.memberImageList}" varStatus="status">
+	<option value="${f:out(memberFile.fileId)}" data-img-src="${f:out(memberFile.imageUrl)}"/>
+</c:forEach>
+</select>
+<input type="button" value="画像を選んでイベントを作成" onClick="createEventWithStamp(this.form.selectImage.value)">
+
+</form>
+<t:form method="post" action="${contextPath}/fileUpload/upload" enctype="multipart/form-data"
+        value="${form}">
+<div class="control-group">
+<label class="control-label">画像登録</label>
+<div class="controls">
+<t:input name="imageFile" type="file" />
+</div>
+</div>
+<t:input name="imageUploadButton" type="submit" value="画像を登録" />
+</t:form>
+
+
+
+</div>
+</div>
+
 </div><!-- main -->
 <div class="span3 right_navi">
 </div>
@@ -82,27 +104,11 @@
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js"></script>
 <script type="text/javascript" src="${contextPath}/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="${contextPath}/js/image-picker.min.js"></script>
+<script type="text/javascript" src="${contextPath}/js/image-resize.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
-		/*トップ画面*/
-//		$(".eventImage").click(function(){//画像ボタン押下(イベント選択）時処理
-//			alert('呼ばれました');
-//			$('#EventId').val($(this).
-//				closest('div'). // <div>要素直上の<tr>要素を取得
-//				children('input'). // 配下から2番目の<input>要素を取得
-//				text() // そのテキスト値をEventIdの値に設定
-//			);
-//			$('#showSocialEventForm').submit();
-//		});
-//		$(".eventDetailButton").click(function(){//詳細ボタン押下時処理
-//			$('#EventId').val(jQuery.trim($(this).parent().parent().children("td:nth-child(2)").text()));
-//			$('#showSocialEventForm').submit();
-//		});
-		/* 詳細画面 */
-		$("#updateEventStampButton").click(function(){//スタンプの更新ボタン押下時処理
-			$('#updateEventStampForm').submit();
-		});
-    	$('#stamp-dialog').dialog({//QRコード表示ダイアログ初期制御
+		$('#stamp-dialog').dialog({//QRコード表示ダイアログ初期制御
 			autoOpen: false
 		});
 		$(".showQRButton").click(function() {//QRコード表示ボタン押下時処理
@@ -111,39 +117,18 @@
 			//選択行のバーコードをダイアログに移す
 			$('#stamp-dialog').dialog('open');
 		});
-
-		//入力時のkeyupをイベントリスナーとして登録
-		$(".stamp-action").each(function(){
-			$(this).bind('keyup', makePostSentence(this));
-		});
-		$(".stamp-place").each(function(){
-			$(this).bind('keyup', makePostSentence(this));
-		});
-
+		//画像選択
+		$("select.image-picker").imagepicker();
 	});
 
-	//Topページ、イベント詳細表示
-	function showEventDetail(id){
-		document.getElementById('EventId').value = id;
-		document.getElementById('showSocialEventForm').submit();
+	//Topページ、スタンプ詳細表示
+	function showStampDetail(authKey){
+		document.getElementById('authKey').value = authKey;
+		document.getElementById('showStampForm').submit();
 	}
 
-	//詳細ページ、投稿の表示制御
-	function makePostSentence(element){
-		var v, old = element.value;
-		return function(){
-			if(old != (v=element.value)){
-				old = v;
-				place = $(this).parent().parent().find('.stamp-place').val();
-				action = $(this).parent().parent().find('.stamp-action').val();
-				str = $(this).val();
-				if(place){
-					$(this).parent().parent().find('.stamp-fbpost').val(place + "にて" + action);
-				}else{
-					$(this).parent().parent().find('.stamp-fbpost').val(action);
-				}
-			}
-		}
+	function createEventWithStamp(id){
+		alert("未実装です file_id="+id);
 	}
 
 </script></body>

@@ -31,6 +31,14 @@ public interface StampDao {
 	List<StampDto> findStampAndMemberFileByEventId(int eventId);
 
 	/**
+	 * イベントＩＤに該当するデータを取得します。
+	 * @param eventId
+	 * @return
+	 */
+	List<StampDto> findStampAndMemberFileByFacebookId(String facebookId);
+
+
+	/**
 	 * イベントを登録します。
 	 * @param event
 	 */
@@ -43,5 +51,20 @@ public interface StampDao {
 	 * @return
 	 */
 	StampDto findStampAndMemberFileByStampId(int eventId,int stampId);
+
+	/**
+	 * スタンプの更新を行います。
+	 * @param stamp
+	 * @return
+	 */
+	int updateStampByPrimary(Stamp stamp);
+
+	/**
+	 * 認証keyを元に、スタンプ情報を取得します。
+	 *
+	 * @param authKey
+	 * @return
+	 */
+	StampDto findByAuthKey(String authKey);
 
 }

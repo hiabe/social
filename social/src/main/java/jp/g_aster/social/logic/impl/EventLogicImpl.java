@@ -154,12 +154,15 @@ public class EventLogicImpl implements EventLogic {
 			//スタンプ用データ登録
 			Stamp stamp = new Stamp();
 			BeanUtil.copyProperties(event, stamp);
+			stamp.setCaption("スタンプ"+stampNo);
+			stamp.setMessage(stamp.getCaption()+"を取得しました。");
+			stamp.setPostUrl("http://www.g-aster.jp");
 			stamp.setEventId(event.getEventId());
 			stamp.setFileId(0);
 
 			stamp.setStampNo(stampNo);
 			stamp.setQrFileName(qrStampFileName);
-			stamp.setAuthenticationKey(md5Stamp);
+			stamp.setAuthKey(md5Stamp);
 			stamp.setImageUrl(contextPath+"/img/stamp/"+qrStampFileName);
 
 			stamp.setPageUrl(stampurl);
@@ -218,6 +221,32 @@ public class EventLogicImpl implements EventLogic {
 	@Override
 	public StampDto getStamp(String facebookId, int eventId, int stampId) {
 		return stampDao.findStampAndMemberFileByStampId(eventId, stampId);
+	}
+
+
+	@Override
+	public void updateEvent(EventDto eventDto) throws DataNotFoundException {
+
+
+		//TODO イベントを更新する。（必要か検討中）
+
+
+		for(StampDto stampDto : eventDto.getStampList()){
+			//スタンプを取得
+			StampDto fromDb = stampDao.findStampAndMemberFileByStampId(stampDto.getEventId(), stampDto.getStampId());
+			Stamp stamp = new Stamp();
+			BeanUtil.copyProperties(fromDb, stamp);
+
+			//スタンプを更新
+			stamp.setMessage(stampDto.getMessage());
+			stamp.setPageUrl(stampDto.getPageUrl());
+			stamp.setCaption(stampDto.getCaption());
+
+			if(0 ==stampDao.updateStampByPrimary(stamp)){
+				throw new DataNotFoundException("stampId="+stampDto.getStampId());
+			}
+
+		}
 	}
 
 

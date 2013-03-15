@@ -61,4 +61,10 @@ public interface EventLogic {
 	 */
 	StampDto getStamp(String facebookId,int eventId,int stampId);
 
+	/**
+	 * イベントの更新を実施します。
+	 * @param eventDto
+	 */
+	void updateEvent(EventDto eventDto) throws DataNotFoundException;
+
 }

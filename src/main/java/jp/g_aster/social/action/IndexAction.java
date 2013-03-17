@@ -78,6 +78,13 @@ public class IndexAction {
 	public HttpServletRequest servletRequest;
 
 
+	private String getCallbackURL(){
+		return this.servletRequest.getScheme()+"://"+
+				this.servletRequest.getServerName()+":"+
+				this.servletRequest.getServerPort()+
+				this.servletRequest.getContextPath()+
+				SocialUtil.getCallbackURL();
+	}
 
 	public ActionResult index() {
 
@@ -87,7 +94,7 @@ public class IndexAction {
 			sessionScope.put("redirect","/");
 
 			Facebook facebook = new FacebookFactory().getInstance();
-			String redirectURL = facebook.getOAuthAuthorizationURL(SocialUtil.getCallbackURL());
+			String redirectURL = facebook.getOAuthAuthorizationURL(this.getCallbackURL());
 			sessionScope.put("facebook",facebook);
 			return new Redirect(redirectURL);
 		}

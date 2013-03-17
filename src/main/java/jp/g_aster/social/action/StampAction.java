@@ -84,6 +84,13 @@ public class StampAction {
 		return sessionScope.containsKey("user");
 	}
 
+	private String getCallbackURL(){
+		return this.servletRequest.getScheme()+"://"+
+				this.servletRequest.getServerName()+":"+
+				this.servletRequest.getServerPort()+
+				this.servletRequest.getContextPath()+
+				SocialUtil.getCallbackURL();
+	}
 
 	/**
 	 * QR作成ページを開きます。
@@ -123,8 +130,6 @@ public class StampAction {
 		if(!this.isLogin()){
 			return new Redirect("/");
 		}
-//		String contextPath = SocialProperties.getProps().getProperty("context_path");
-		String contextPath = servletRequest.getContextPath();
 
 		//URLに関する情報を取得
 		Date sysdate = new Date();
@@ -220,7 +225,7 @@ public class StampAction {
 			log.debug("スタンプ獲得のため、callback");
 			Facebook facebook = new FacebookFactory().getInstance();
 			sessionScope.put("redirect","/stamp/getStamp?authKey="+this.authKey);
-			String redirectURL = facebook.getOAuthAuthorizationURL(SocialUtil.getCallbackURL());
+			String redirectURL = facebook.getOAuthAuthorizationURL(this.getCallbackURL());
 			sessionScope.put("facebook",facebook);
 			return new Redirect(redirectURL);
 		}

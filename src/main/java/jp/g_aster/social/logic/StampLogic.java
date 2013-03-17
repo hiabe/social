@@ -26,14 +26,6 @@ public interface StampLogic {
 
 
 	/**
-	 * スタンプIDに該当するデータを取得します。
-	 *
-	 * @param socialEventId
-	 * @return
-	 */
-	StampDto getStamp(int stampId) throws DataNotFoundException;
-
-	/**
 	 * スタンプを作成します。
 	 * @param stamp
 	 */
@@ -78,7 +70,8 @@ public interface StampLogic {
 	 *
 	 * @param user
 	 * @param stampDto
+	 * @param httpContext
 	 */
-	void postToFacebook(User user,StampDto stampDto,Facebook facebook) throws FacebookException;
+	void postToFacebook(User user,StampDto stampDto,Facebook facebook,String httpContext) throws FacebookException;
 
 }

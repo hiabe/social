@@ -152,10 +152,10 @@
 			"com.mysql.jdbc.Driver"
 		</property>
 		<property name="URL">
-			"jdbc:mysql://localhost:3306/XXXX"
+			"jdbc:mysql://localhost:3306/yoyaku"
 		</property>
-		<property name="user">"user"</property>
-		<property name="password">"password"</property>
+		<property name="user">"yoyaku_abe"</property>
+		<property name="password">"yoyaku_pas"</property>
 	</component>
 
 	<!-- for SQLServer -->

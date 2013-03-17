@@ -1,0 +1,54 @@
+# general
+.DS_Store
+*.zip
+*.tar.gz
+*.exe
+*.bz2
+.hg/
+#.gitignore
+ 
+# backup
+*~
+*.bak
+ 
+# gnu global
+GPATH
+GRTAGS
+GSYMS
+GTAGS
+ 
+# c/c++/objc
+a.out
+*.o
+*.a
+ 
+# python
+*.pyc
+build/
+dist/
+*.egg-info
+*.mo
+bulkloader-log-*
+ 
+# java
+*.class
+classes/* 
+*/.* 
+#eclipse
+.*
+**/.*
+**/.*/
+src/test/resources/
+src/main/webapp/img/event/
+src/main/webapp/img/stamp/
+bin/
+#seasar(password)
+jdbc.dicon
+facebook4j.properties
+
+#marven
+target
+# yacc/lex
+lex.yy.c
+*.tab.c
+*.tab.h

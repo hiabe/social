@@ -59,16 +59,24 @@
 <div class="control-group">
 <label class="control-label">linkURL(投稿のlinkです。）</label>
 <div class="controls">
-<t:input name="postUrl" type="text" length="16" placeholder="http://www.hoge.com/"/>
+<t:input name="postUrl" type="text" length="64" placeholder="http://www.hoge.com/"/>
 </div>
 </div>
+
+<div class="control-group">
+<label class="control-label">説明文</label>
+<div class="controls">
+<t:textarea name="description" placeholder="XXXXは◯◯日－XX日までXXで開催中"/>
+</div>
+</div>
+
 
 <div class="control-group">
 <label class="control-label">画像ファイル</label>
 <div class="controls">
 	<select class="image-picker" name="fileId" id="selectImage">
 	<c:forEach var="memberFile" items="${action.memberFileList}" varStatus="status">
-		<option value='${f:out(memberFile.fileId)}' data-img-src='${f:out(memberFile.imageUrl)}'>${f:out(memberFile.fileName)}</option>
+		<option value='${f:out(memberFile.fileId)}' data-img-src='${contextPath}${f:out(memberFile.imageUrl)}'>${f:out(memberFile.fileName)}</option>
 	</c:forEach>
 	</select>
 </div>

@@ -41,13 +41,13 @@ public class SocialUtil {
 	    return hexStrBuilder.toString();
 	}
 
-	public static MemberImageFileDto getDefaultMemberImage(){
-		MemberImageFileDto dto = new MemberImageFileDto();
-		dto.setFileId(0);
-		dto.setFileName("noimage.png");
-		dto.setImageUrl(SocialProperties.getProps().getProperty("context_path")+"/img/noimage.png");
-		return dto;
-	}
+//	public static MemberImageFileDto getDefaultMemberImage(){
+//		MemberImageFileDto dto = new MemberImageFileDto();
+//		dto.setFileId(0);
+//		dto.setFileName("noimage.png");
+//		dto.setImageUrl(SocialProperties.getProps().getProperty("context_path")+"/img/noimage.png");
+//		return dto;
+//	}
 
 
 	public static String getCallbackURL(){

@@ -20,9 +20,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import jp.g_aster.social.dto.EventDto;
+import jp.g_aster.social.dto.MemberImageFileDto;
 import jp.g_aster.social.dto.StampDto;
+import jp.g_aster.social.entity.MemberImageFile;
 import jp.g_aster.social.form.TopForm;
 import jp.g_aster.social.service.EventService;
 import jp.g_aster.social.service.StampService;
@@ -72,6 +75,9 @@ public class IndexAction {
 
 	public TopForm topForm;
 
+	public HttpServletRequest servletRequest;
+
+
 
 	public ActionResult index() {
 
@@ -92,6 +98,20 @@ public class IndexAction {
 		log.debug("◆name◆="+user.getName());
 
 		topForm =stampService.getStampAndImageList(user.getId());
+		for(StampDto stampDto :topForm.getStampList()){
+			if(stampDto.getFileId()==MemberImageFile.FILEID_NOIMAGE){
+				//TODO ハードコーディングを修正する。
+				stampDto.setMemberFileUrl(servletRequest.getContextPath()+"/img/noimage.png");
+			}
+		}
+		//画像が全くない場合は追加する。
+		if(topForm.getMemberImageList().isEmpty()){
+			MemberImageFileDto dto = new MemberImageFileDto();
+			dto.setFileId(0);
+			dto.setFileName("noimage.png");
+			dto.setImageUrl(servletRequest.getContextPath()+"/img/noimage.png");
+			topForm.getMemberImageList().add(dto);
+		}
 		//自分が保持しているスタンプを取得する。
 
 		return new Forward("index.jsp");

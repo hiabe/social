@@ -48,7 +48,7 @@ public class EventLogicImpl implements EventLogic {
 
 	@Override
 	public EventDto getSocialEvent(int socialEventId) throws DataNotFoundException {
-		MemberImageFileDto memberImageFileDto =  SocialUtil.getDefaultMemberImage();
+//		MemberImageFileDto memberImageFileDto =  SocialUtil.getDefaultMemberImage();
 		//ソーシャルイベントの取得
 		Event event = eventDao.findByPrimary(socialEventId);
 		if(event==null){
@@ -62,9 +62,9 @@ public class EventLogicImpl implements EventLogic {
 		for(Stamp stamp:stampList){
 			StampDto stampDto = new StampDto();
 			BeanUtil.copyProperties(stamp, stampDto);
-			if(StringUtils.isEmpty(stampDto.getMemberFileUrl())){
-				stampDto.setMemberFileUrl(memberImageFileDto.getImageUrl());
-			}
+//			if(StringUtils.isEmpty(stampDto.getMemberFileUrl())){
+//				stampDto.setMemberFileUrl(memberImageFileDto.getImageUrl());
+//			}
 			dto.addStamp(stampDto);
 		}
 
@@ -85,8 +85,8 @@ public class EventLogicImpl implements EventLogic {
 				MemberImageFile memberImageFile = memberImageFileDao.findByFileId(event.getFileId());
 				dto.setMemberFileUrl(memberImageFile.getImageUrl());
 			}else{
-				MemberImageFileDto imageFileDto = SocialUtil.getDefaultMemberImage();
-				dto.setMemberFileUrl(imageFileDto.getImageUrl());
+//				MemberImageFileDto imageFileDto = SocialUtil.getDefaultMemberImage();
+//				dto.setMemberFileUrl(imageFileDto.getImageUrl());
 			}
 			dtoList.add(dto);
 		}
@@ -208,10 +208,10 @@ public class EventLogicImpl implements EventLogic {
 	public EventDto getEvent(String authKey) {
 		//authkeyを条件に、イベント情報を取得
 		EventDto eventDto = eventDao.findByAuthKey(authKey);
-		if(StringUtils.isEmpty(eventDto.getMemberFileUrl())){
-			MemberImageFileDto memberImageFileDto = SocialUtil.getDefaultMemberImage();
-			eventDto.setMemberFileUrl(memberImageFileDto.getImageUrl());
-		}
+//		if(StringUtils.isEmpty(eventDto.getMemberFileUrl())){
+//			MemberImageFileDto memberImageFileDto = SocialUtil.getDefaultMemberImage();
+//			eventDto.setMemberFileUrl(memberImageFileDto.getImageUrl());
+//		}
 
 		return eventDto;
 

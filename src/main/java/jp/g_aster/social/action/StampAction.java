@@ -22,15 +22,16 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import jp.g_aster.social.dto.EventDto;
 import jp.g_aster.social.dto.MemberImageFileDto;
 import jp.g_aster.social.dto.StampDto;
+import jp.g_aster.social.entity.MemberImageFile;
 import jp.g_aster.social.exception.DataNotFoundException;
 import jp.g_aster.social.form.CreateEventForm;
 import jp.g_aster.social.form.UpdateEventForm;
 import jp.g_aster.social.service.StampService;
-import jp.g_aster.social.util.SocialProperties;
 import jp.g_aster.social.util.SocialUtil;
 
 import org.apache.commons.logging.Log;
@@ -76,6 +77,9 @@ public class StampAction {
 
 	public @RequestParameter String authKey;
 
+
+	public HttpServletRequest servletRequest;
+
 	private boolean isLogin(){
 		return sessionScope.containsKey("user");
 	}
@@ -86,6 +90,7 @@ public class StampAction {
 	 * @return
 	 */
 	public ActionResult createStamp() {
+
 		if(!this.isLogin()){
 			log.info("◆◆ログインしていないため、ＴＯＰへ戻ります◆◆");
 			return new Redirect("/");
@@ -96,6 +101,13 @@ public class StampAction {
 		memberFileList =  stampService.getMemberImageFileList(user.getId());
 		if(memberFileList == null){
 			memberFileList = new ArrayList<MemberImageFileDto>();
+		}
+		if(memberFileList.isEmpty()){
+			MemberImageFileDto dto = new MemberImageFileDto();
+			dto.setFileId(0);
+			dto.setFileName("noimage.png");
+			dto.setImageUrl("/img/noimage.png");
+			memberFileList.add(dto);
 		}
 
 		return new Forward("createStamp.jsp");
@@ -111,7 +123,8 @@ public class StampAction {
 		if(!this.isLogin()){
 			return new Redirect("/");
 		}
-		String contextPath = SocialProperties.getProps().getProperty("context_path");
+//		String contextPath = SocialProperties.getProps().getProperty("context_path");
+		String contextPath = servletRequest.getContextPath();
 
 		//URLに関する情報を取得
 		Date sysdate = new Date();
@@ -120,8 +133,8 @@ public class StampAction {
 		stampDto.setAuthKey(md5Stamp);
 		stampDto.setFacebookId(user.getId());
 		stampDto.setQrFileName(md5Stamp+".jpg");
-		stampDto.setPageUrl(contextPath +"/stamp/getStamp?authKey="+md5Stamp);
-		stampDto.setImageUrl(contextPath+"/img/stamp/"+stampDto.getQrFileName());
+		stampDto.setPageUrl("/stamp/getStamp?authKey="+md5Stamp);
+		stampDto.setImageUrl("/img/stamp/"+stampDto.getQrFileName());
 
 
 		stampService.makeStamp(stampDto);
@@ -145,7 +158,20 @@ public class StampAction {
 			log.debug("◆authenticationKey is "+authKey);
 			User user = (User)this.sessionScope.get("user");
 			this.stampDto =  stampService.getStamp(authKey);
+			if(stampDto.getFileId() == MemberImageFile.FILEID_NOIMAGE){
+				stampDto.setMemberFileUrl("/img/noimage.png");
+			}
 			this.memberFileList = stampService.getMemberImageFileList(user.getId());
+			if(this.memberFileList == null){
+				memberFileList = new ArrayList<MemberImageFileDto>();
+			}
+			if(this.memberFileList.isEmpty()){
+				MemberImageFileDto dto = new MemberImageFileDto();
+				dto.setFileId(0);
+				dto.setFileName("noimage.png");
+				dto.setImageUrl("/img/noimage.png");
+				memberFileList.add(dto);
+			}
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 			actionContext.getFlashMap().put("error", "不正なデータを受信したため、最初からやり直してください。");
@@ -170,6 +196,10 @@ public class StampAction {
 		}
 		try {
 			this.stampDto =  stampService.getStamp(authKey);
+			if(stampDto.getFileId() == MemberImageFile.FILEID_NOIMAGE){
+				stampDto.setMemberFileUrl("/img/noimage.png");
+			}
+
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 			return new Forward("/common/error.jsp");
@@ -198,7 +228,16 @@ public class StampAction {
 		log.debug("authKey=["+this.authKey+"]");
 
 		try {
-			stampService.getStampAndPostFacebook(authKey, user,(Facebook)sessionScope.get("facebook"));
+			log.debug("★-"+servletRequest.getServerName());
+			log.debug("★-"+servletRequest.getServerPort());
+			log.debug("★-"+servletRequest.getScheme());
+
+			String httpContext = servletRequest.getScheme()+"://"
+								+servletRequest.getServerName()+":"
+								+servletRequest.getServerPort()
+								+servletRequest.getContextPath();
+
+			stampService.getStampAndPostFacebook(authKey, user,(Facebook)sessionScope.get("facebook"),httpContext);
 		} catch (FacebookException e) {
 			// TODO 自動生成された catch ブロック
 			e.printStackTrace();

@@ -60,15 +60,15 @@ public class StampLogicImpl implements StampLogic {
 	@Override
 	public List<StampDto> getStampList(String facebookId) {
 		List<StampDto> stampDtoList =  stampDao.findStampAndMemberFileByFacebookId(facebookId);
-		MemberImageFileDto imageFileDto = SocialUtil.getDefaultMemberImage();
+//		MemberImageFileDto imageFileDto = SocialUtil.getDefaultMemberImage();
 
-		for(StampDto stampDto:stampDtoList){
-			log.debug(stampDto.toString());
-			//ファイル取得
-			if(stampDto.getFileId() == MemberImageFile.FILEID_NOIMAGE){
-				stampDto.setMemberFileUrl(imageFileDto.getImageUrl());
-			}
-		}
+//		for(StampDto stampDto:stampDtoList){
+//			log.debug(stampDto.toString());
+//			//ファイル取得
+//			if(stampDto.getFileId() == MemberImageFile.FILEID_NOIMAGE){
+//				stampDto.setMemberFileUrl(imageFileDto.getImageUrl());
+//			}
+//		}
 		return stampDtoList;
 
 	}
@@ -102,12 +102,6 @@ public class StampLogicImpl implements StampLogic {
 
 
 	@Override
-	public StampDto getStamp(int stampId) throws DataNotFoundException {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
-	}
-
-	@Override
 	public void makeStamp(StampDto stampDto) {
 
 		Date sysdate = new Date();
@@ -135,9 +129,9 @@ public class StampLogicImpl implements StampLogic {
 	@Override
 	public StampDto getStamp(String authKey) {
 		StampDto dto =stampDao.findByAuthKey(authKey);
-		if(dto.getFileId()==MemberImageFile.FILEID_NOIMAGE){
-			dto.setMemberFileUrl(SocialUtil.getDefaultMemberImage().getImageUrl());
-		}
+//		if(dto.getFileId()==MemberImageFile.FILEID_NOIMAGE){
+//			dto.setMemberFileUrl(SocialUtil.getDefaultMemberImage().getImageUrl());
+//		}
 		return dto;
 	}
 
@@ -153,7 +147,7 @@ public class StampLogicImpl implements StampLogic {
 	}
 
 	@Override
-	public void postToFacebook(User user, StampDto stampDto,Facebook facebook) throws FacebookException {
+	public void postToFacebook(User user, StampDto stampDto,Facebook facebook,String httpContext) throws FacebookException {
 		//facebookへポストする。
 		PostUpdate post;
 		Post.Action action = new Post.Action(){
@@ -173,19 +167,17 @@ public class StampLogicImpl implements StampLogic {
 		List<Post.Action> actionList = new ArrayList<Post.Action>();
 		actionList.add(action);
 		try{
-			if(stampDto.getPageUrl().startsWith("http://localhost")){
-				post = new PostUpdate(new URL("http://www.g-aster.jp"));
-			}else{
-				post = new PostUpdate(new URL(stampDto.getPageUrl()));
-			}
-			log.debug("◆◆link="+action.getLink());
-			log.debug("◆◆name="+action.getName());
+			post = new PostUpdate(new URL(stampDto.getPostUrl()));
+//			log.debug("◆◆link="+action.getLink());
+//			log.debug("◆◆name="+action.getName());
 //			Gson gson = new Gson();
-			post.picture(new URL(stampDto.getMemberFileUrl()))
-			.name("名前")
+			log.debug("◆◆picture="+httpContext+stampDto.getMemberFileUrl());
+			log.debug("◆◆link="+post.getLink());
+			post.picture(new URL(httpContext+stampDto.getMemberFileUrl()))
+			.name(stampDto.getLinkName())
 			.message(user.getName()+"が"+stampDto.getMessage())
 			.caption(stampDto.getCaption())
-			.description("説明文")
+			.description(stampDto.getDescription())
 //			.actions(actionList)
 			;
 			facebook.postFeed(post);

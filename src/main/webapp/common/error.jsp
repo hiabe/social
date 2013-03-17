@@ -18,7 +18,7 @@
 
 <!DOCTYPE html>
 <html lang="ja">
-<c:import url="/common/hemlheader.jsp"/>
+<c:import url="/common/htmlheader.jsp"/>
 <body>
 <c:import url="header.jsp"/>
 <c:import url="/common/errors.jsp"/>

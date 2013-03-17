@@ -51,6 +51,6 @@ public class SocialUtil {
 
 
 	public static String getCallbackURL(){
-		return SocialProperties.getProps().getProperty("context_path") + SocialProperties.getProps().getProperty("callback_URI");
+		return SocialProperties.getProps().getProperty("callback_URI");
 	}
 }

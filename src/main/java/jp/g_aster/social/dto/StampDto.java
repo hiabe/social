@@ -28,6 +28,8 @@ public class StampDto {
 
 	private String message;
 
+	private String description;
+
 	private String authKey;
 
 	private int fileId;
@@ -296,6 +298,21 @@ public class StampDto {
 	 */
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+
+	/**
+	 * @return description
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * @param description セットする description
+	 */
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	@Override

@@ -95,6 +95,10 @@ line.separator=\n
       <artifactId>maven-jetty-plugin</artifactId>
       <version>6.1.26</version>
       <configuration>
+      <jettyConfig>etc/jetty-ssl.xml</jettyConfig>
+      <!--
+      <contextPath>/</contextPath>
+      -->
         <scanIntervalSeconds>10</scanIntervalSeconds>
           <stopKey>foo</stopKey>
           <stopPort>9999</stopPort>
@@ -306,6 +310,11 @@ line.separator=\n
     	<groupId>log4j</groupId>
     	<artifactId>log4j</artifactId>
     	<version>1.2.17</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.slf4j</groupId>
+    	<artifactId>slf4j-log4j12</artifactId>
+    	<version>1.7.2</version>
     </dependency>
   </dependencies>
   <profiles>

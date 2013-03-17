@@ -2,7 +2,7 @@
 <html lang="ja">
 <jsp:include page="/common/htmlheader.jsp"></jsp:include>
 <body>
-<img src="${f:out(action.stampDto.imageUrl)}"/>
+<img src="${contextPath}${f:out(action.stampDto.imageUrl)}"/>
 <br />
 <input type="button" value="閉じる" onClick="window.close()">
 <br>

@@ -61,6 +61,8 @@ public class Stamp {
 	@Column(name="message")
 	private String message;
 
+	@Column(name="description")
+	private String description;
 
 	@Column(name="auth_key")
 	private String authKey;
@@ -321,6 +323,22 @@ public class Stamp {
 	 */
 	public void setModified(Date modified) {
 		this.modified = modified;
+	}
+
+
+
+	/**
+	 * @return description
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * @param description セットする description
+	 */
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	@Override

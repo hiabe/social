@@ -40,7 +40,7 @@
 <c:forEach var="stamp" items="${action.topForm.stampList}" varStatus="status">
 	<li class="span6">
 		<div class="thumbnail">
-			<img src="${f:out(stamp.memberFileUrl)}" alt="${f:out(stamp.caption)}">
+			<img src="${contextPath}${f:out(stamp.memberFileUrl)}" alt="${f:out(stamp.caption)}">
 			<div class="caption">
 				<h5>${f:out(stamp.caption)}</h5>
 				<p>${f:out(stamp.message)}</p>
@@ -56,20 +56,15 @@
 <br/>
 <t:form action="${contextPath}/stamp/createStamp" method="post" value="${action}" >
 <t:input name="createEvent" class="btn btn-info" type="submit" value="アクションＱＲを作成する"/>
+<select class="image-picker" name="selectImage">
+<c:forEach var="memberFile" items="${action.topForm.memberImageList}" varStatus="status">
+	<option value="${f:out(memberFile.fileId)}" data-img-src="${contextPath}${f:out(memberFile.imageUrl)}"/>
+</c:forEach>
+</select>
 </t:form>
-<h4 class="border facebook topline bottomline leftline7 rightline">画像一覧</h4>
 <div class="row-fluid">
 <input type="hidden" id="StampId" name="stampId" value="" />
 <div class="span12">
-<form>
-<select class="image-picker" name="selectImage">
-<c:forEach var="memberFile" items="${action.topForm.memberImageList}" varStatus="status">
-	<option value="${f:out(memberFile.fileId)}" data-img-src="${f:out(memberFile.imageUrl)}"/>
-</c:forEach>
-</select>
-<input type="button" value="画像を選んでイベントを作成" onClick="createEventWithStamp(this.form.selectImage.value)">
-
-</form>
 <t:form method="post" action="${contextPath}/fileUpload/upload" enctype="multipart/form-data"
         value="${form}">
 <div class="control-group">

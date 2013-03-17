@@ -11,7 +11,6 @@ import javax.annotation.Resource;
 import jp.g_aster.social.dto.MemberImageFileDto;
 import jp.g_aster.social.logic.MemberImageFileLogic;
 import jp.g_aster.social.service.FileUploadService;
-import jp.g_aster.social.util.SocialProperties;
 
 import org.apache.commons.fileupload.FileItem;
 
@@ -32,7 +31,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 		MemberImageFileDto dto = new MemberImageFileDto();
 		dto.setFacebookId(user.getId());
 		dto.setFileName(item.getName());
-		dto.setImageUrl(SocialProperties.getProps().getProperty("context_path")+"/img/stamp/"+file.getName());
+		dto.setImageUrl("/img/stamp/"+file.getName());
 		dto.setCreated(sysdate);
 		dto.setModified(sysdate);
 		dto.setCreator(user.getName());

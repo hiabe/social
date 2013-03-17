@@ -62,17 +62,23 @@
 <t:input name="postUrl" type="text" length="16" id="postUrl" value="${f:out(action.stampDto.postUrl)}"/>
 </div>
 </div>
+<div class="control-group">
+<label class="control-label">説明文</label>
+<div class="controls">
+<t:textarea name="description" id="description" value="${f:out(action.stampDto.description)}"/>
+</div>
+</div>
 
 <div class="control-group">
 <label class="control-label">投稿画像</label>
 <div class="controls">
-<a href="${f:out(action.stampDto.pageUrl)}"><img src="${f:out(action.stampDto.memberFileUrl)}" class="thumbnail"/></a>
+<a href="${contextPath}${f:out(action.stampDto.pageUrl)}"><img src="${contextPath}${f:out(action.stampDto.memberFileUrl)}" class="thumbnail"/></a>
 </div>
 </div>
 
 <select class="image-picker" name="fileId">
 <c:forEach var="memberFile" items="${action.memberFileList}" varStatus="status">
-	<option value='${f:out(memberFile.fileId)}' data-img-src='${f:out(memberFile.imageUrl)}'>${f:out(memberFile.fileName)}</option>
+	<option value='${f:out(memberFile.fileId)}' data-img-src='${contextPath}${f:out(memberFile.imageUrl)}'>${f:out(memberFile.fileName)}</option>
 </c:forEach>
 </select>
 

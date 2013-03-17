@@ -12,7 +12,6 @@ import jp.g_aster.social.dao.MemberImageFileDao;
 import jp.g_aster.social.dto.MemberImageFileDto;
 import jp.g_aster.social.entity.MemberImageFile;
 import jp.g_aster.social.logic.MemberImageFileLogic;
-import jp.g_aster.social.util.SocialUtil;
 
 import org.seasar.framework.beans.util.BeanUtil;
 
@@ -30,7 +29,7 @@ public class MemberImageFileLogicImpl implements MemberImageFileLogic {
 		List<MemberImageFile> fileList = memberImageFileDao.findByFacebookId(facebookId);
 
 		List<MemberImageFileDto> dtoList = new ArrayList<MemberImageFileDto>();
-		dtoList.add(SocialUtil.getDefaultMemberImage());
+//		dtoList.add(SocialUtil.getDefaultMemberImage());
 
 		for (MemberImageFile file: fileList){
 			MemberImageFileDto imageFileDto = new MemberImageFileDto();

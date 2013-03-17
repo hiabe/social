@@ -57,7 +57,7 @@ public class FacebookAction {
 			log.debug("accessToken()="+facebook.getOAuthAccessToken());
 			log.debug("email="+facebook.getMe(new Reading().locale(Locale.JAPAN)).getEmail());
 			log.debug("◆redirect◆="+(String)sessionScope.get("redirect"));
-			sessionScope.put("user", facebook.getMe(new Reading().locale(Locale.JAPAN)));
+			sessionScope.put("user", facebook.getMe(new Reading().locale(facebook.getMe().getLocale())));
 		} catch (FacebookException e) {
 			log.error(e);
 			e.printStackTrace();

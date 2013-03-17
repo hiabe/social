@@ -64,10 +64,14 @@ public interface StampService {
 	 * ゲットした事をDBへ登録します。（何度でも可）
 	 *
 	 * @param authKey
-	 * @param facebookId
+	 * @param user
 	 * @param facebook
+	 * @param httpContext
+	 * @return
+	 * @throws DataNotFoundException
+	 * @throws FacebookException
 	 */
-	StampDto getStampAndPostFacebook(String authKey, User user,Facebook facebook) throws DataNotFoundException,FacebookException;
+	StampDto getStampAndPostFacebook(String authKey, User user,Facebook facebook,String httpContext) throws DataNotFoundException,FacebookException;
 
 
 	/**

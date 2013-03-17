@@ -82,7 +82,7 @@ public class StampServiceImpl implements StampService {
 	}
 
 	@Override
-	public StampDto getStampAndPostFacebook(String authKey, User user,Facebook facebook)
+	public StampDto getStampAndPostFacebook(String authKey, User user,Facebook facebook,String httpContext)
 		throws DataNotFoundException, FacebookException {
 		//authkeyよりスタンプ情報を取得
 		StampDto stampDto = stampLogic.getStamp(authKey);
@@ -105,7 +105,7 @@ public class StampServiceImpl implements StampService {
 		}
 
 		//Facebookeへポスト
-		stampLogic.postToFacebook(user, stampDto,facebook);
+		stampLogic.postToFacebook(user, stampDto,facebook,httpContext);
 		return stampDto;
 	}
 

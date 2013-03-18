@@ -86,10 +86,12 @@ line.separator=\n
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>tomcat-maven-plugin</artifactId>
       </plugin>
+      <!--
       <plugin>
         <groupId>org.mortbay.jetty</groupId>
         <artifactId>maven-jetty-plugin</artifactId>
       </plugin>
+       -->
     <plugin>
       <groupId>org.mortbay.jetty</groupId>
       <artifactId>maven-jetty-plugin</artifactId>

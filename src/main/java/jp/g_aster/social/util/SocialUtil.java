@@ -3,8 +3,6 @@ package jp.g_aster.social.util;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import jp.g_aster.social.dto.MemberImageFileDto;
-
 public class SocialUtil {
 
 	/**

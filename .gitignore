@@ -46,7 +46,7 @@ logs/
 #seasar(password)
 jdbc.dicon
 facebook4j.properties
-
+socialRally.properties
 #marven
 target
 # yacc/lex

@@ -97,6 +97,12 @@ line.separator=\n
       <artifactId>maven-jetty-plugin</artifactId>
       <version>6.1.26</version>
       <configuration>
+         <connectors>
+            <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+              <port>80</port>
+              <maxIdleTime>60000</maxIdleTime>
+            </connector>
+          </connectors>
       <jettyConfig>etc/jetty-ssl.xml</jettyConfig>
       <!--
       <contextPath>/</contextPath>
@@ -317,6 +323,11 @@ line.separator=\n
     	<groupId>org.slf4j</groupId>
     	<artifactId>slf4j-log4j12</artifactId>
     	<version>1.7.2</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.codemonkey.simplejavamail</groupId>
+    	<artifactId>simple-java-mail</artifactId>
+    	<version>2.1</version>
     </dependency>
   </dependencies>
   <profiles>

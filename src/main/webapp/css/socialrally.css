@@ -111,7 +111,9 @@ input .text-long {
     margin-left: 180px;
     line-height:2rem;
 }
-    line-height:2rem;
-}
-    line-height:2rem;
-}
+.image-select{
+	border: 1px solid;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    padding: 20px 20px;
+}}

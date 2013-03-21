@@ -42,6 +42,7 @@ src/test/resources/
 src/main/webapp/img/event/
 src/main/webapp/img/stamp/
 bin/
+logs/
 #seasar(password)
 jdbc.dicon
 facebook4j.properties

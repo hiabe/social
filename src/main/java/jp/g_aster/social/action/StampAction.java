@@ -33,6 +33,7 @@ import jp.g_aster.social.form.CreateEventForm;
 import jp.g_aster.social.form.UpdateEventForm;
 import jp.g_aster.social.service.StampService;
 import jp.g_aster.social.util.SocialUtil;
+import jp.g_aster.social.validator.URLValidator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,8 +42,14 @@ import org.seasar.cubby.action.ActionContext;
 import org.seasar.cubby.action.ActionResult;
 import org.seasar.cubby.action.Form;
 import org.seasar.cubby.action.Forward;
+import org.seasar.cubby.action.PreRenderMethod;
 import org.seasar.cubby.action.Redirect;
 import org.seasar.cubby.action.RequestParameter;
+import org.seasar.cubby.action.Validation;
+import org.seasar.cubby.validator.DefaultValidationRules;
+import org.seasar.cubby.validator.ValidationRules;
+import org.seasar.cubby.validator.validators.MaxLengthValidator;
+import org.seasar.cubby.validator.validators.RequiredValidator;
 
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
@@ -80,29 +87,36 @@ public class StampAction {
 
 	public HttpServletRequest servletRequest;
 
+
+
+
 	private boolean isLogin(){
 		return sessionScope.containsKey("user");
 	}
 
 	private String getCallbackURL(){
-		return this.servletRequest.getScheme()+"://"+
-				this.servletRequest.getServerName()+":"+
-				this.servletRequest.getServerPort()+
-				this.servletRequest.getContextPath()+
-				SocialUtil.getCallbackURL();
+		int port= this.servletRequest.getServerPort();
+		if(port==80 || port==443){
+			return this.servletRequest.getScheme()+"://"+
+					this.servletRequest.getServerName()+
+					this.servletRequest.getContextPath()+
+					SocialUtil.getCallbackURL();
+		}else{
+			return this.servletRequest.getScheme()+"://"+
+					this.servletRequest.getServerName()+":"+
+					this.servletRequest.getServerPort()+
+					this.servletRequest.getContextPath()+
+					SocialUtil.getCallbackURL();
+		}
 	}
 
 	/**
-	 * QR作成ページを開きます。
-	 * @return
+	 * 画像ファイル一覧を取得します。prerenderで利用
 	 */
-	public ActionResult createStamp() {
-
+	public void getMemberFiles(){
 		if(!this.isLogin()){
-			log.info("◆◆ログインしていないため、ＴＯＰへ戻ります◆◆");
-			return new Redirect("/");
+			return;
 		}
-
 		User user = (User)this.sessionScope.get("user");
 		//イベントの詳細とスタンプ情報を取得する。
 		memberFileList =  stampService.getMemberImageFileList(user.getId());
@@ -116,15 +130,43 @@ public class StampAction {
 			dto.setImageUrl("/img/noimage.png");
 			memberFileList.add(dto);
 		}
-
-		return new Forward("createStamp.jsp");
 	}
 
 	/**
+	 * QR作成ページを開きます。
+	 * @return
+	 */
+	@PreRenderMethod("getMemberFiles")
+	public ActionResult createStamp() {
+
+		if(!this.isLogin()){
+			log.info("◆◆ログインしていないため、ＴＯＰへ戻ります◆◆");
+			return new Redirect("/");
+		}
+		return new Forward("createStamp.jsp");
+	}
+
+	  // バリデーションのルール
+	  public ValidationRules stampCreateValidationRules = new DefaultValidationRules() {
+	    @Override
+	    public void initialize() {
+	      // フィールド "userId" は必須入力で最大10文字まで
+	      add("message","メッセージ", new RequiredValidator(), new MaxLengthValidator(64));
+	      add("linkName","リンクタイトル", new RequiredValidator(), new MaxLengthValidator(32));
+	      add("caption","見出し", new RequiredValidator(), new MaxLengthValidator(32));
+	      add("postUrl","投稿URL", new RequiredValidator(), new MaxLengthValidator(32));
+	      add("postUrl","投稿URL", new URLValidator());
+	      add("description","説明文", new RequiredValidator(), new MaxLengthValidator(128));
+	    }
+	  };
+
+	  /**
 	 * スタンプデータを生成します。
 	 * @return
 	 */
 	@Form("stampDto")
+	@Validation(rules = "stampCreateValidationRules", errorPage = "createStamp.jsp")
+	@PreRenderMethod("getMemberFiles")
 	public ActionResult create(){
 
 		if(!this.isLogin()){
@@ -152,6 +194,7 @@ public class StampAction {
 	 * スタンプ情報の詳細を取得します。
 	 * @return
 	 */
+	@PreRenderMethod("getMemberFiles")
 	public ActionResult showDetail() {
 
 		if(!this.isLogin()){
@@ -161,21 +204,9 @@ public class StampAction {
 
 		try {
 			log.debug("◆authenticationKey is "+authKey);
-			User user = (User)this.sessionScope.get("user");
 			this.stampDto =  stampService.getStamp(authKey);
 			if(stampDto.getFileId() == MemberImageFile.FILEID_NOIMAGE){
 				stampDto.setMemberFileUrl("/img/noimage.png");
-			}
-			this.memberFileList = stampService.getMemberImageFileList(user.getId());
-			if(this.memberFileList == null){
-				memberFileList = new ArrayList<MemberImageFileDto>();
-			}
-			if(this.memberFileList.isEmpty()){
-				MemberImageFileDto dto = new MemberImageFileDto();
-				dto.setFileId(0);
-				dto.setFileName("noimage.png");
-				dto.setImageUrl("/img/noimage.png");
-				memberFileList.add(dto);
 			}
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
@@ -212,7 +243,7 @@ public class StampAction {
 			e.printStackTrace();
 			return new Forward("/common/error.jsp");
 		}
-		return new Forward("/event/viewQRCode.jsp");
+		return new Forward("/stamp/viewQRCode.jsp");
 	}
 
 	/**
@@ -263,6 +294,8 @@ public class StampAction {
 	 * @return
 	 */
 	@Form("stampDto")
+	@Validation(rules = "stampCreateValidationRules", errorPage = "stampDetail.jsp")
+	@PreRenderMethod("getMemberFiles")
 	public ActionResult update() {
 		if(!this.isLogin()){
 			return new Redirect("/");
@@ -273,6 +306,7 @@ public class StampAction {
 		stampDto.setModified(new Date());
 		try {
 			stampService.updateStamp(stampDto);
+			this.stampDto = stampService.getStamp(stampDto.getAuthKey());
 		} catch (DataNotFoundException e) {
 			e.printStackTrace();
 			actionContext.getFlashMap().put("error", "データ更新でエラーが発生しました。");

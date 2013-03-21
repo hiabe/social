@@ -32,25 +32,25 @@
 <c:import url="/common/errors.jsp"/>
 <c:import url="/common/notice.jsp"/>
 <t:form action="${contextPath}/stamp/showDetail" value="${action}" method="post" id="showStampForm">
-<h4 class="border facebook topline bottomline leftline7 rightline">QRコード一覧</h4>
+<h4 class="border facebook topline bottomline leftline7 rightline">作成したＱＲ一覧</h4>
 <div class="row-fluid">
 <input type="hidden" id="authKey" name="authKey" value="" />
-<div class="span12">
-<ul class="thumbnails">
 <c:forEach var="stamp" items="${action.topForm.stampList}" varStatus="status">
-	<li class="span6">
+<div class="span12 border topline bottomline leftline rightline ">
+	<div class="span4">
 		<div class="thumbnail">
-			<img src="${contextPath}${f:out(stamp.memberFileUrl)}" alt="${f:out(stamp.caption)}">
-			<div class="caption">
-				<h5>${f:out(stamp.caption)}</h5>
-				<p>${f:out(stamp.message)}</p>
-				<p><t:input name="stampDetail" type="button" class="btn stampDetailButton" value="詳細" onClick="showStampDetail('${f:out(stamp.authKey)}')"/></p>
-			</div>
+			<img src="${contextPath}${f:out(stamp.memberFileUrl)}" class="thumbnail-img" alt="${f:out(stamp.caption)}">
 		</div>
-	</li>
-</c:forEach>
-</ul>
+	</div>
+	<div class="span8">
+		<div class="caption">
+			<h5>${f:out(stamp.caption)}</h5>
+			<p>${f:out(stamp.message)}</p>
+			<p><t:input name="stampDetail" type="button" class="btn stampDetailButton" value="詳細" onClick="showStampDetail('${f:out(stamp.authKey)}')"/></p>
+		</div>
+	</div>
 </div>
+</c:forEach>
 </div>
 </t:form>
 <br/>
@@ -65,15 +65,14 @@
 <div class="row-fluid">
 <input type="hidden" id="StampId" name="stampId" value="" />
 <div class="span12">
-<t:form method="post" action="${contextPath}/fileUpload/upload" enctype="multipart/form-data"
-        value="${form}">
+<t:form method="post" action="${contextPath}/fileUpload/upload" enctype="multipart/form-data" value="${form}">
 <div class="control-group">
 <label class="control-label">画像登録</label>
 <div class="controls">
 <t:input name="imageFile" type="file" />
 </div>
 </div>
-<t:input name="imageUploadButton" type="submit" value="画像を登録" />
+<t:input name="imageUploadButton" type="submit" class="btn btn-info" value="画像を登録" />
 </t:form>
 
 

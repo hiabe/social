@@ -33,7 +33,7 @@
 <c:import url="/common/notice.jsp"/>
 <div class="span6 border topline bottomline leftline rightline" id="main">
 <t:form action="${contextPath}/stamp/update" value="${action}" method="post" id="showStampForm" class="form-horizontal">
-<h4 class="border facebook topline bottomline leftline7 rightline">イベント詳細</h4>
+<h4 class="border facebook topline bottomline leftline7 rightline">ＱＲコード詳細</h4>
 <div class="row-fluid">
 <input type="hidden" id="stampId" name="stampId" value="${f:out(action.stampDto.stampId)}" />
 <input type="hidden" id="authKey" name="authKey" value="${f:out(action.stampDto.authKey)}" />
@@ -43,7 +43,6 @@
 <t:input name="message" type="text" length="16" value="${f:out(action.stampDto.message)}" />
 </div>
 </div>
-
 <div class="control-group">
 <label class="control-label">リンクタイトル</label>
 <div class="controls">
@@ -72,19 +71,28 @@
 <div class="control-group">
 <label class="control-label">投稿画像</label>
 <div class="controls">
-<a href="${contextPath}${f:out(action.stampDto.pageUrl)}"><img src="${contextPath}${f:out(action.stampDto.memberFileUrl)}" class="thumbnail"/></a>
+<img src="${contextPath}${f:out(action.stampDto.memberFileUrl)}" class="thumbnail-img" id="post-img"/>
 </div>
 </div>
-
+<div class="image-select">
+画像を選択する。
 <select class="image-picker" name="fileId">
 <c:forEach var="memberFile" items="${action.memberFileList}" varStatus="status">
 	<option value='${f:out(memberFile.fileId)}' data-img-src='${contextPath}${f:out(memberFile.imageUrl)}'>${f:out(memberFile.fileName)}</option>
 </c:forEach>
 </select>
+</div>
+
+<div class="control-group">
+<label class="control-label">ＱＲコード(クリックすると読込時と同じ動作をします。)</label>
+<div class="controls">
+<a href="${contextPath}${f:out(action.stampDto.pageUrl)}"><img src="${contextPath}${f:out(action.stampDto.imageUrl)}" class="thumbnail-img"/></a>
+<p><t:input name="selectImageButton" type="button" class="btn eventDetailButton" value="拡大表示" onClick="showQRCodedlg('${f:out(action.stampDto.authKey)}')"/></p>
+</div>
+</div>
 
 </div>
-<p><t:input name="selectImageButton" type="button" class="btn eventDetailButton" value="ＱＲ表示" onClick="showQRCodedlg('${f:out(action.stampDto.authKey)}')"/></p>
-<p><t:input name="updateEvent" class="btn" type="submit" value="更新"/></p>
+<p><t:input name="updateStamp" class="btn" id="updateStamp" type="button" value="更新"/></p>
 </t:form>
 <br/>
 </div><!-- main -->
@@ -102,32 +110,40 @@
 
 
 
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js"></script>
-<script type="text/javascript" src="${contextPath}/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="${contextPath}/js/image-picker.min.js"></script>
-<script type="text/javascript" src="${contextPath}/js/image-resize.js"></script>
-<script type="text/javascript">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js"></script>
+<script src="${contextPath}/js/bootstrap.min.js"></script>
+<script src="${contextPath}/js/image-picker.min.js"></script>
+<script src="${contextPath}/js/image-resize.js"></script>
+<script src="${contextPath}/js/jquery.ui.draggable.js"></script>
+<script src="${contextPath}/js/jquery.alerts.js"></script>
+<script>
 	$(document).ready(function() {
 		/* 詳細画面 */
 		$("#updateEventStampButton").click(function(){//スタンプの更新ボタン押下時処理
 			$('#updateEventStampForm').submit();
 		});
-    	$('#stamp-dialog').dialog({//QRコード表示ダイアログ初期制御
+		$('#stamp-dialog').dialog({//QRコード表示ダイアログ初期制御
 			autoOpen: false
-		});
-		$(".showQRButton").click(function() {//QRコード表示ボタン押下時処理
-			$('#stamp-dialog img').attr("src",'http://localhost/yoyaku_sys/yoyaku/img/stamp/' +$(this).parent().parent().parent().find('.qrcode').val());
-			$('#stamp-dialog img').attr("alt",$(this).parent().parent().parent().find('.qrcode').val());
-			//選択行のバーコードをダイアログに移す
-			$('#stamp-dialog').dialog('open');
 		});
 		//画像選択
 		$("select.image-picker").imagepicker({
 			hide_select:  true,
 	    });
+		$('img.image_picker_image').click(function(){
+			alert($(this).attr('src'));
+			$('#post-img').attr("src",$(this).attr("src"));
+		});
+		//更新ボタン
+		$('#updateStamp').click(function(){
+			jConfirm('更新します。よろしいですか?', '更新確認', function(isOk) {
+		    	jAlert('Confirmed: ' + isOk, 'Confirmation Results');
+		        if (isOk) {
+		        	$('#showStampForm').submit();
+		        }
+			});
+		});
 	});
-
 	function mdlg(element){
 		returnArray = showModalDialog("${contextPath}/stamp/selectImage");
 		alert("ファイルID:"+returnArray[0]);

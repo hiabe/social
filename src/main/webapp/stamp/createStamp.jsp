@@ -30,7 +30,7 @@
 <div class="span6" id="main">
 <c:import url="/common/errors.jsp"/>
 <c:import url="/common/notice.jsp"/>
-<t:form action="${contextPath}/stamp/create" value="${action}"  class="form-horizontal" method="post">
+<t:form action="${contextPath}/stamp/create" id="createStampForm" value="${action}"  class="form-horizontal" method="post">
 <h4 class="border facebook topline bottomline leftline7 rightline">QRコード作成</h4>
 <input type="hidden" id="fileId" value="" />
 
@@ -75,14 +75,14 @@
 <label class="control-label">画像ファイル</label>
 <div class="controls">
 	<select class="image-picker" name="fileId" id="selectImage">
-	<c:forEach var="memberFile" items="${action.memberFileList}" varStatus="status">
+	<c:forEach var="memberFile" items="${memberFileList}" varStatus="status">
 		<option value='${f:out(memberFile.fileId)}' data-img-src='${contextPath}${f:out(memberFile.imageUrl)}'>${f:out(memberFile.fileName)}</option>
 	</c:forEach>
 	</select>
 </div>
 </div>
 
-<t:input name="createEvent" class="btn btn-info" type="submit" value="登録"/>
+<t:input name="createStamp" class="btn btn-info" type="button" id="createStamp"value="登録"/>
 
 </t:form>
 </div><!-- main -->
@@ -108,7 +108,9 @@
 <script src="${contextPath}/js/image-picker.min.js"></script>
 <script src="${contextPath}/js/bootstrap.min.js"></script>
 <script src="${contextPath}/js/image-resize.js"></script>
-<script type="text/javascript">
+<script src="${contextPath}/js/jquery.ui.draggable.js"></script>
+<script src="${contextPath}/js/jquery.alerts.js"></script>
+<script>
 
 	$(document).ready(function() {
 		$(function() {
@@ -116,6 +118,14 @@
 			$("select.image-picker").imagepicker({
 				hide_select:  true,
 		    });
+		});
+		//登録ボタン
+		$('#createStamp').click(function(){
+			jConfirm('登録します。よろしいですか?', '登録確認', function(isOk) {
+		        if (isOk) {
+		        	$('#createStampForm').submit();
+		        }
+			});
 		});
 	});
 

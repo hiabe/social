@@ -11,4 +11,15 @@
                 $(this).height(fh);
             }
         });
+        var sl = 'img.thumbnail-img'; //selector
+        $(sl).each(function(){
+            var w = $(this).width();
+            var h = $(this).height();
+            if (w >= h) {
+                $(this).width(fw);
+            } else {
+                $(this).height(fh);
+            }
+        });
+
     });

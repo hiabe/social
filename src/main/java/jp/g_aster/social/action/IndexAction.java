@@ -23,11 +23,13 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import jp.g_aster.social.dto.EventDto;
+import jp.g_aster.social.dto.InquiryDto;
 import jp.g_aster.social.dto.MemberImageFileDto;
 import jp.g_aster.social.dto.StampDto;
 import jp.g_aster.social.entity.MemberImageFile;
 import jp.g_aster.social.form.TopForm;
 import jp.g_aster.social.service.EventService;
+import jp.g_aster.social.service.InquiryService;
 import jp.g_aster.social.service.StampService;
 import jp.g_aster.social.util.SocialUtil;
 
@@ -51,6 +53,8 @@ public class IndexAction {
 
 	private Log log = LogFactory.getLog(this.getClass());
 
+	public InquiryDto inquiryDto = new InquiryDto();
+
 	public EventDto eventDto = new EventDto();
 
 	public Map<String, Object> sessionScope;
@@ -67,11 +71,15 @@ public class IndexAction {
 
 	public List<EventDto> memberEventList;
 
-	@Resource
-	public EventService socialEventService;
+//	@Resource
+//	public EventService socialEventService;
 
 	@Resource
 	public StampService stampService;
+
+	@Resource
+	public InquiryService inquiryService;
+
 
 	public TopForm topForm;
 
@@ -79,12 +87,21 @@ public class IndexAction {
 
 
 	private String getCallbackURL(){
-		return this.servletRequest.getScheme()+"://"+
-				this.servletRequest.getServerName()+":"+
-				this.servletRequest.getServerPort()+
-				this.servletRequest.getContextPath()+
-				SocialUtil.getCallbackURL();
+		int port= this.servletRequest.getServerPort();
+		if(port==80 || port==443){
+			return this.servletRequest.getScheme()+"://"+
+					this.servletRequest.getServerName()+
+					this.servletRequest.getContextPath()+
+					SocialUtil.getCallbackURL();
+		}else{
+			return this.servletRequest.getScheme()+"://"+
+					this.servletRequest.getServerName()+":"+
+					this.servletRequest.getServerPort()+
+					this.servletRequest.getContextPath()+
+					SocialUtil.getCallbackURL();
+		}
 	}
+
 
 	public ActionResult index() {
 
@@ -95,6 +112,7 @@ public class IndexAction {
 
 			Facebook facebook = new FacebookFactory().getInstance();
 			String redirectURL = facebook.getOAuthAuthorizationURL(this.getCallbackURL());
+			log.debug("redirectURL is "+this.getCallbackURL());
 			sessionScope.put("facebook",facebook);
 			return new Redirect(redirectURL);
 		}
@@ -108,7 +126,7 @@ public class IndexAction {
 		for(StampDto stampDto :topForm.getStampList()){
 			if(stampDto.getFileId()==MemberImageFile.FILEID_NOIMAGE){
 				//TODO ハードコーディングを修正する。
-				stampDto.setMemberFileUrl(servletRequest.getContextPath()+"/img/noimage.png");
+				stampDto.setMemberFileUrl("/img/noimage.png");
 			}
 		}
 		//画像が全くない場合は追加する。
@@ -116,7 +134,7 @@ public class IndexAction {
 			MemberImageFileDto dto = new MemberImageFileDto();
 			dto.setFileId(0);
 			dto.setFileName("noimage.png");
-			dto.setImageUrl(servletRequest.getContextPath()+"/img/noimage.png");
+			dto.setImageUrl("/img/noimage.png");
 			topForm.getMemberImageList().add(dto);
 		}
 		//自分が保持しているスタンプを取得する。
@@ -129,7 +147,7 @@ public class IndexAction {
 	 * @return
 	 */
 	public ActionResult about() {
-		return new Forward("/commmon/about.jsp");
+		return new Forward("/common/about.jsp");
 	}
 
 	/**
@@ -137,7 +155,18 @@ public class IndexAction {
 	 * @return
 	 */
 	public ActionResult inquiry() {
-		return new Forward("/commmon/inquiry.jsp");
+		//ログインは関係なし
+		return new Forward("/common/inquiry.jsp");
+	}
+
+	/**
+	 * お問い合わせ内容送信
+	 * @return
+	 */
+	@Form("inquiryDto")
+	public ActionResult postInquiry() {
+		inquiryService.postMessage(inquiryDto);
+		return new Forward("/common/inquiry_finished.jsp");
 	}
 
 	/**
@@ -145,39 +174,39 @@ public class IndexAction {
 	 * @return
 	 */
 	public ActionResult privacy() {
-		return new Forward("/commmon/privacy.jsp");
+		return new Forward("/common/privacy.jsp");
 	}
 
-	/**
-	 * イベント用、スタンプラリーになったら利用する。
-	 * @return
-	 */
-	@Form("eventDto")
-	public ActionResult indexEvent() {
-
-		//認証していない場合は、FBのOAUTHへ
-		if (!this.sessionScope.containsKey("user")) {
-			log.debug("認証エラーのため、callback");
-			sessionScope.put("redirect","/");
-
-			Facebook facebook = new FacebookFactory().getInstance();
-			String redirectURL = facebook.getOAuthAuthorizationURL(SocialUtil.getCallbackURL());
-			sessionScope.put("facebook",facebook);
-			return new Redirect(redirectURL);
-		}
-
-		//facebook情報取得
-		User user = (User)this.sessionScope.get("user");
-		log.debug("◆email◆="+user.getEmail());
-		log.debug("◆name◆="+user.getName());
-
-		//自分が管理しているイベントを取得する。
-		this.eventList =  socialEventService.getSocialEventList(user.getId());
-
-		//自分が参加しているイベントを取得する。
-		this.memberEventList = socialEventService.getSocialEventList(user.getId());
-
-		return new Forward("index.jsp");
-	}
+//	/**
+//	 * イベント用、スタンプラリーになったら利用する。
+//	 * @return
+//	 */
+//	@Form("eventDto")
+//	public ActionResult indexEvent() {
+//
+//		//認証していない場合は、FBのOAUTHへ
+//		if (!this.sessionScope.containsKey("user")) {
+//			log.debug("認証エラーのため、callback");
+//			sessionScope.put("redirect","/");
+//
+//			Facebook facebook = new FacebookFactory().getInstance();
+//			String redirectURL = facebook.getOAuthAuthorizationURL(SocialUtil.getCallbackURL());
+//			sessionScope.put("facebook",facebook);
+//			return new Redirect(redirectURL);
+//		}
+//
+//		//facebook情報取得
+//		User user = (User)this.sessionScope.get("user");
+//		log.debug("◆email◆="+user.getEmail());
+//		log.debug("◆name◆="+user.getName());
+//
+//		//自分が管理しているイベントを取得する。
+//		this.eventList =  socialEventService.getSocialEventList(user.getId());
+//
+//		//自分が参加しているイベントを取得する。
+//		this.memberEventList = socialEventService.getSocialEventList(user.getId());
+//
+//		return new Forward("index.jsp");
+//	}
 
 }
